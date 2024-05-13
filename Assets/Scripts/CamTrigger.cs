@@ -1,17 +1,37 @@
 using System.Collections;
 using System.Collections.Generic;
+using Cinemachine; 
 using UnityEngine;
 
 public class CamTrigger : MonoBehaviour
 {
-    public CameraController cameraController; // Reference to the CameraController script
+    public GameObject wideAngleCamera;
 
-    void OnTriggerEnter(Collider other)
+
+    private void Start()
+    {
+        // Ensure that a virtual camera is assigned
+        if (wideAngleCamera == null)
+        {
+            Debug.LogError("Room Camera is not assigned to the CameraPriorityChanger script!");
+        }
+
+        wideAngleCamera.SetActive(false);
+    }
+
+    public void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            // Trigger camera transition when player enters the trigger area
-            cameraController.TransitionToWideAngle();
+            wideAngleCamera.SetActive(true);
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            wideAngleCamera.SetActive(false);
         }
     }
 }
