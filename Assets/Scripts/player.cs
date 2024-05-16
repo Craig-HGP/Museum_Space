@@ -52,13 +52,17 @@ public class Player : MonoBehaviour
         
         // Rotate the player based on trackpad input
         transform.Rotate(Vector3.up * rotateHorizontal * rotationSpeed);
+        
+        // Apply rotation to camera (or player object if you want)
+        float currentRotationX = transform.localEulerAngles.x;
+        transform.localRotation = Quaternion.Euler(pitch, transform.localEulerAngles.y, 0f);
+
+        // Restore original X-axis rotation of the player
+        transform.Rotate(Vector3.right * (currentRotationX - transform.localEulerAngles.x));
 
         // Adjust the pitch (up and down) based on mouse input
         pitch -= rotateVertical * pitchSpeed;
         pitch = Mathf.Clamp(pitch, -pitchRange, pitchRange); // Clamp pitch to avoid flipping upside down
-
-        // Apply rotation to camera (or player object if you want)
-        //Cinemachine.CinemachineVirtualCamera.main.transform.localRotation = Quaternion.Euler(pitch, 0f, 0f);
 
         // Move the player
         transform.Translate(movement * speed * Time.deltaTime);
