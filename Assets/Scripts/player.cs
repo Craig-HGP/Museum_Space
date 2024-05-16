@@ -58,7 +58,9 @@ public class Player : MonoBehaviour
         pitch = Mathf.Clamp(pitch, -pitchRange, pitchRange); // Clamp pitch to avoid flipping upside down
 
         // Apply rotation to camera (or player object if you want)
-        //Cinemachine.CinemachineVirtualCamera.main.transform.localRotation = Quaternion.Euler(pitch, 0f, 0f);
+        //transform.localRotation = Quaternion.Euler(pitch, 0f, 0f);
+        float currentRotationX = transform.localEulerAngles.x;
+        transform.localRotation = Quaternion.Euler(pitch, transform.localEulerAngles.y, 0f);
 
         // Move the player
         transform.Translate(movement * speed * Time.deltaTime);
