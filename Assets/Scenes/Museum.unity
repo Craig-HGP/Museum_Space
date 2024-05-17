@@ -9151,15 +9151,13 @@ MonoBehaviour:
   speed: 10
   rotationSpeed: 7
   pitchSpeed: 7
-  pitchRange: 80
-  rb: {fileID: 0}
-  pitch: 0
+  pitchRange: 50
   jumpForce: 100
   groundCheckDistance: 0.1
   groundLayer:
+    serializedVersion: 2
     m_Bits: 64
   mass: 8
-  isGrounded: 0
   cameraTransform: {fileID: 963194228}
 --- !u!54 &1638732867
 Rigidbody:
