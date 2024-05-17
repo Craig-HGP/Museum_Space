@@ -10,12 +10,12 @@ public class Player : MonoBehaviour
     public float pitchRange = 80f; // Adjust the maximum pitch angle (in degrees) as needed
     private Rigidbody rb;
     private float pitch = 0f;
-    public float jumpForce = 20f; // Adjust the jump force as needed
+    public float jumpForce = 100f; // Adjust the jump force as needed
     public float groundCheckDistance = 0.1f; // Distance to check for ground
     public LayerMask groundLayer; // Layer mask for the ground objects
-    public float mass = 3f; // Adjust the gravity scale as needed
+    public float mass = 100f; // Adjust the gravity scale as needed
     private bool isGrounded;
-    public Camera cameraTransform;
+    public Transform cameraTransform;
 
     void Start()
     {
@@ -25,7 +25,7 @@ public class Player : MonoBehaviour
         rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
 
         // Adjust Rigidbody properties
-        rb.drag = 0.5f; // Adjust drag for more realistic falling
+        rb.drag = 0f; // Adjust drag for more realistic falling
         rb.angularDrag = 0.5f; // Adjust angular drag as needed
 
         // Set the mass
@@ -77,14 +77,11 @@ public class Player : MonoBehaviour
         pitch -= rotateVertical * pitchSpeed;
         pitch = Mathf.Clamp(pitch, -pitchRange, pitchRange); // Clamp pitch to avoid flipping upside down
 
-        // Apply rotation to player object
-        transform.localRotation = Quaternion.Euler(pitch, transform.localEulerAngles.y, 0f);
-
         // Move the player
         transform.Translate(movement * speed * Time.deltaTime, Space.World);
 
-        // Apply rotation to camera (or player object if you want)
-        Cinemachine.CinemachineVirtualCamera.main.transform.localRotation = Quaternion.Euler(pitch, 0f, 0f);
+        // Apply rotation to player object
+        transform.localRotation = Quaternion.Euler(pitch, transform.localEulerAngles.y, 0f);
 
         // Jump input
         if (Input.GetKeyDown(KeyCode.Space) && IsGrounded())
