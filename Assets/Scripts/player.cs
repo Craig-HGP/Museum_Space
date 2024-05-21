@@ -20,7 +20,7 @@ public class Player : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-
+        
         // Lock rotation along X and Z axes
         rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
 
@@ -90,15 +90,6 @@ public class Player : MonoBehaviour
         }
     }
 
-    void Jump()
-    {
-        // Apply jump force if grounded
-        if (isGrounded)
-        {
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-        }
-    }
-
     void FixedUpdate()
     {
         // Check if the player is grounded using raycast
@@ -115,5 +106,14 @@ public class Player : MonoBehaviour
     {
         // Perform a Raycast downward to check if there's ground beneath the player
         return Physics.Raycast(transform.position, Vector3.down, groundCheckDistance, groundLayer);
+    }
+
+    void Jump()
+    {
+        // Apply jump force if grounded
+        if (isGrounded)
+        {
+            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        }
     }
 }
