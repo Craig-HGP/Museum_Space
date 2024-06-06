@@ -4,116 +4,129 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    public float speed = 10f; // Adjust the speed as needed
-    public float rotationSpeed = 7f; // Adjust the rotation speed as needed
-    public float pitchSpeed = 7f; // Adjust the pitch (up and down) speed as needed
-    public float pitchRange = 50f; // Adjust the maximum pitch angle (in degrees) as needed
-    private Rigidbody rb;
-    private float pitch = 0f;
-    public float jumpForce = 100f; // Adjust the jump force as needed
-    public float groundCheckDistance = 0.1f; // Distance to check for ground
-    public LayerMask groundLayer; // Layer mask for the ground objects
-    public float mass = 100f; // Adjust the gravity scale as needed
-    private bool isGrounded;
-    public Transform cameraTransform;
+    public Transform cameraTransform; // Reference to the camera transform
+    private CharacterController controller; // Reference to the CharacterController component
+    public LayerMask groundLayer; // Layer to check if the player is grounded
+    public float speed = 10f; // Movement speed
+    public float rotationSpeed = 7f; // Rotation speed
+    private float pitch = 0f; // Current pitch rotation of the camera
+    public float pitchSpeed = 7f; // Pitch speed for looking up and down
+    public float pitchRange = 45f; // Pitch range limit
+    private bool isGrounded; // Whether the player is on the ground
+    [SerializeField] private bool isMoving = false;
+
+    public float groundCheckDist = 0.1f; // Check if grounded by distance
+    public float jumpForce = 5f; // Jump force
+    public float gravity = -9.81f; // Gravity constant value
+    public float gravityScale = 3f; // Adjust the gravity scale as needed
+    private Vector3 velocity; // Player's current velocity
 
     void Start()
     {
-        rb = GetComponent<Rigidbody>();
-        
-        // Lock rotation along X and Z axes
-        rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
-
-        // Adjust Rigidbody properties
-        rb.drag = 0f; // Adjust drag for more realistic falling
-        rb.angularDrag = 0.5f; // Adjust angular drag as needed
-
-        // Set the mass
-        rb.mass = mass;
-
-        // Set collision detection mode
-        rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
-
-        // Set physics material to reduce bounciness
-        Collider collider = GetComponent<Collider>();
-        collider.material = new PhysicMaterial()
-        {
-            bounciness = 0,
-            frictionCombine = PhysicMaterialCombine.Multiply,
-            bounceCombine = PhysicMaterialCombine.Multiply
-        };
+        // Get the CharacterController component attached to this GameObject
+        controller = GetComponent<CharacterController>();
     }
 
     void Update()
     {
-        // Get input from arrow keys or WASD keys
-        float moveHorizontal = Input.GetAxis("Horizontal");
-        float moveVertical = Input.GetAxis("Vertical");
+        // Handle player movement based on input
+        MovePlayer();
 
-        // Get rotation input from mouse
-        float rotateHorizontal = Input.GetAxis("Mouse X");
-        float rotateVertical = Input.GetAxis("Mouse Y");
-
-        // Calculate the movement direction relative to the camera
-        Vector3 forward = cameraTransform.forward;
-        Vector3 right = cameraTransform.right;
-
-        // Ensure the forward vector is horizontal
-        forward.y = 0f;
-        right.y = 0f;
-
-        forward.Normalize();
-        right.Normalize();
-
-        Vector3 movement = forward * moveVertical + right * moveHorizontal;
-
-        // Normalize movement vector to ensure consistent speed diagonally
-        movement.Normalize();
-
-        // Rotate the player based on mouse input
-        transform.Rotate(Vector3.up * rotateHorizontal * rotationSpeed);
-
-        // Adjust the pitch (up and down) based on mouse input
-        pitch -= rotateVertical * pitchSpeed;
-        pitch = Mathf.Clamp(pitch, -pitchRange, pitchRange); // Clamp pitch to avoid flipping upside down
-
-        // Move the player
-        transform.Translate(movement * speed * Time.deltaTime, Space.World);
-
-        // Apply rotation to player object
-        transform.localRotation = Quaternion.Euler(pitch, transform.localEulerAngles.y, 0f);
+        // Handle looking around with the mouse/trackpad
+        LookAround();
 
         // Jump input
-        if (Input.GetKeyDown(KeyCode.Space) && IsGrounded())
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
             Jump();
         }
+
+        // Apply gravity to the player
+        ApplyGravity();
     }
 
-    void FixedUpdate()
+    void MovePlayer()
     {
-        // Check if the player is grounded using raycast
-        isGrounded = Physics.Raycast(transform.position, Vector3.down, groundCheckDistance, groundLayer);
-
-        // Apply gravity manually if needed
-        if (!isGrounded)
+        // Get input from WASD keys or arrow keys
+        float moveHorizontal = Input.GetAxis("Horizontal");
+        float moveVertical = Input.GetAxis("Vertical");
+        
+        if(moveHorizontal != 0 || moveVertical != 0)
         {
-            rb.AddForce(Vector3.down * mass * Physics.gravity.y);
+            isMoving = true;
+            Debug.Log("moving at " + moveHorizontal + ", " + moveVertical);
         }
+        else if(moveHorizontal == 0 && moveVertical == 0)
+        {
+            isMoving = false;
+        }
+
+        // Calculate movement direction relative to the camera
+        Vector3 forward = cameraTransform.forward;
+        Vector3 right = cameraTransform.right;
+
+        // Ensure the movement direction is horizontal
+        forward.y = 0f;
+        right.y = 0f;
+
+        // Normalize directions to ensure consistent speed
+        forward.Normalize();
+        right.Normalize();
+
+        // Calculate movement direction
+        Vector3 movement = forward * moveVertical + right * moveHorizontal;
+
+        // Move the player using the CharacterController
+        controller.Move(movement * speed * Time.deltaTime);
+    }
+
+    void LookAround()
+    {
+        // Get mouse input for rotation
+        float rotateHorizontal = Input.GetAxis("Mouse X");
+        float rotateVertical = Input.GetAxis("Mouse Y");
+
+        // Rotate the player around the Y-axis (horizontal rotation)
+        transform.Rotate(Vector3.up * rotateHorizontal * rotationSpeed);
+
+        // Adjust the pitch (vertical rotation) of the camera
+        pitch -= rotateVertical * pitchSpeed;
+        pitch = Mathf.Clamp(pitch, -pitchRange, pitchRange); // Clamp pitch to avoid flipping over
+
+        // Apply the pitch rotation to the camera
+        cameraTransform.localRotation = Quaternion.Euler(pitch, 0f, 0f);
+    }
+
+    void Jump()
+    {
+        // Set the velocity for the jump
+        velocity.y = Mathf.Sqrt(jumpForce * -2f * gravity * gravityScale);
+    }
+
+    void ApplyGravity()
+    {
+        // Check if the player is grounded
+        isGrounded = controller.isGrounded || IsGrounded();
+
+        // Debug log to check if grounding is detected
+        Debug.Log("Is Grounded: " + isGrounded);
+
+        // If grounded and descending, set a small negative value to keep the player grounded
+        if (isGrounded && velocity.y < 0)
+        {
+            velocity.y = -2f;
+        }
+
+        // Apply gravity to the velocity
+        velocity.y += gravity * gravityScale * Time.deltaTime;
+
+        // Move the player using the CharacterController
+        controller.Move(velocity * Time.deltaTime);
     }
 
     bool IsGrounded()
     {
         // Perform a Raycast downward to check if there's ground beneath the player
-        return Physics.Raycast(transform.position, Vector3.down, groundCheckDistance, groundLayer);
-    }
-
-    void Jump()
-    {
-        // Apply jump force if grounded
-        if (isGrounded)
-        {
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-        }
+        return Physics.Raycast(transform.position, Vector3.down, groundCheckDist, groundLayer);
     }
 }

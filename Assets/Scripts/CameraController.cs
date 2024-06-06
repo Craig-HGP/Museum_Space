@@ -47,6 +47,12 @@ public class CameraController : MonoBehaviour
         isTransitioning = true;
     }
 
+    public void TransitionToSidescrollAngle()
+    {
+        // Start camera transition to wider angle
+        isTransitioning = true;
+    }
+
     public void ResetCamera()
     {
         // Start camera transition back to initial settings
