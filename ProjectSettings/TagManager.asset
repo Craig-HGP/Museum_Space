@@ -6,6 +6,10 @@ TagManager:
   tags:
   - GameManager
   - Coin
+  - EnemyFloor
+  - KillBox
+  - RoomTrigger
+  - PlatformTrigger
   layers:
   - Default
   - TransparentFX
