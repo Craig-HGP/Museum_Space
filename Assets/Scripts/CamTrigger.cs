@@ -9,22 +9,14 @@ public class CamTrigger : MonoBehaviour
 {
     public GameObject wideAngleCamera;
     public GameObject sidescrollAngleCamera;
+    public GameObject tightAngleCamera;
 
 
     private void Start()
     {
-        // Ensure that a virtual camera is assigned
-        if (wideAngleCamera == null)
-        {
-            Debug.LogError("Room Camera is not assigned to the CameraPriorityChanger script!");
-        }
-
+        tightAngleCamera.SetActive(true);
+        
         wideAngleCamera.SetActive(false);
-
-        if (sidescrollAngleCamera == null)
-        {
-            Debug.LogError("Platform Camera is not assigned to the CameraPriorityChanger script!");
-        }
 
         sidescrollAngleCamera.SetActive(false);
     }
@@ -34,6 +26,8 @@ public class CamTrigger : MonoBehaviour
         if (CompareTag("RoomTrigger") && other.CompareTag("Player"))
         {
             wideAngleCamera.SetActive(true);
+            sidescrollAngleCamera.SetActive(false);
+            tightAngleCamera.SetActive(false);
         }
         else if (CompareTag("PlatformTrigger") && other.CompareTag("Player"))
         {
@@ -47,6 +41,7 @@ public class CamTrigger : MonoBehaviour
         if (CompareTag("RoomTrigger") && other.CompareTag("Player"))
         {
             wideAngleCamera.SetActive(false);
+            tightAngleCamera.SetActive(true);
         }
         else if (CompareTag("PlatformTrigger") && other.CompareTag("Player"))
         {

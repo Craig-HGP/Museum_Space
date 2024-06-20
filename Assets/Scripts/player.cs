@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Player : MonoBehaviour
@@ -13,9 +14,8 @@ public class Player : MonoBehaviour
     public float pitchSpeed = 7f; // Pitch speed for looking up and down
     public float pitchRange = 45f; // Pitch range limit
     private bool isGrounded; // Whether the player is on the ground
-    [SerializeField] private bool isMoving = false;
 
-    public float groundCheckDist = 0.1f; // Check if grounded by distance
+    public float groundCheckDist = 1.0f; // Check if grounded by distance
     public float jumpForce = 5f; // Jump force
     public float gravity = -9.81f; // Gravity constant value
     public float gravityScale = 3f; // Adjust the gravity scale as needed
@@ -35,14 +35,14 @@ public class Player : MonoBehaviour
         // Handle looking around with the mouse/trackpad
         LookAround();
 
+        // Apply gravity to the player
+        ApplyGravity();
+
         // Jump input
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
             Jump();
         }
-
-        // Apply gravity to the player
-        ApplyGravity();
     }
 
     void MovePlayer()
@@ -50,16 +50,6 @@ public class Player : MonoBehaviour
         // Get input from WASD keys or arrow keys
         float moveHorizontal = Input.GetAxis("Horizontal");
         float moveVertical = Input.GetAxis("Vertical");
-        
-        if(moveHorizontal != 0 || moveVertical != 0)
-        {
-            isMoving = true;
-            Debug.Log("moving at " + moveHorizontal + ", " + moveVertical);
-        }
-        else if(moveHorizontal == 0 && moveVertical == 0)
-        {
-            isMoving = false;
-        }
 
         // Calculate movement direction relative to the camera
         Vector3 forward = cameraTransform.forward;
@@ -83,8 +73,10 @@ public class Player : MonoBehaviour
     void LookAround()
     {
         // Get mouse input for rotation
-        float rotateHorizontal = Input.GetAxis("Mouse X");
         float rotateVertical = Input.GetAxis("Mouse Y");
+        float rotateHorizontal = Input.GetAxis("Mouse X");
+        
+        Debug.Log("Pitch value: " + Input.GetAxis("Mouse Y"));
 
         // Rotate the player around the Y-axis (horizontal rotation)
         transform.Rotate(Vector3.up * rotateHorizontal * rotationSpeed);
@@ -107,9 +99,6 @@ public class Player : MonoBehaviour
     {
         // Check if the player is grounded
         isGrounded = controller.isGrounded || IsGrounded();
-
-        // Debug log to check if grounding is detected
-        Debug.Log("Is Grounded: " + isGrounded);
 
         // If grounded and descending, set a small negative value to keep the player grounded
         if (isGrounded && velocity.y < 0)
