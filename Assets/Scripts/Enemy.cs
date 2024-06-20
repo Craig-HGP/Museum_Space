@@ -26,8 +26,11 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    public void OnTriggerEnter(Collider other)
+    void OnTriggerEnter(Collider other)
     {
+        Debug.Log("Enemy entered generic other collision!");
+
+        
         if (other.CompareTag("KillBox"))
         {
             Debug.Log("Enemy entered kill box!");
