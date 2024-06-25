@@ -8,7 +8,8 @@ using UnityEngine.UI;
 public class CamTrigger : MonoBehaviour
 {
     public GameObject wideAngleCamera;
-    public GameObject sidescrollAngleCamera;
+    public GameObject sidescrollAngleCameraLeft;
+    public GameObject sidescrollAngleCameraRight;
     public GameObject tightAngleCamera;
 
 
@@ -18,7 +19,9 @@ public class CamTrigger : MonoBehaviour
         
         wideAngleCamera.SetActive(false);
 
-        sidescrollAngleCamera.SetActive(false);
+        sidescrollAngleCameraLeft.SetActive(false);
+
+        sidescrollAngleCameraRight.SetActive(false);
     }
 
     public void OnTriggerEnter(Collider other)
@@ -26,13 +29,21 @@ public class CamTrigger : MonoBehaviour
         if (CompareTag("RoomTrigger") && other.CompareTag("Player"))
         {
             wideAngleCamera.SetActive(true);
-            sidescrollAngleCamera.SetActive(false);
+            sidescrollAngleCameraLeft.SetActive(false);
+            sidescrollAngleCameraRight.SetActive(false);
             tightAngleCamera.SetActive(false);
         }
-        else if (CompareTag("PlatformTrigger") && other.CompareTag("Player"))
+        else if (CompareTag("LeftPlatformTrigger") && other.CompareTag("Player"))
         {
             wideAngleCamera.SetActive(false);
-            sidescrollAngleCamera.SetActive(true);
+            sidescrollAngleCameraLeft.SetActive(true);
+            sidescrollAngleCameraRight.SetActive(false);
+        }
+        else if (CompareTag("RightPlatformTrigger") && other.CompareTag("Player"))
+        {
+            wideAngleCamera.SetActive(false);
+            sidescrollAngleCameraLeft.SetActive(false);
+            sidescrollAngleCameraRight.SetActive(true);
         }
     }
 
@@ -43,9 +54,14 @@ public class CamTrigger : MonoBehaviour
             wideAngleCamera.SetActive(false);
             tightAngleCamera.SetActive(true);
         }
-        else if (CompareTag("PlatformTrigger") && other.CompareTag("Player"))
+        else if (CompareTag("LeftPlatformTrigger") && other.CompareTag("Player"))
         {
-            sidescrollAngleCamera.SetActive(false);
+            sidescrollAngleCameraLeft.SetActive(false);
+            wideAngleCamera.SetActive(true);
+        }
+        else if (CompareTag("RightPlatformTrigger") && other.CompareTag("Player"))
+        {
+            sidescrollAngleCameraRight.SetActive(false);
             wideAngleCamera.SetActive(true);
         }
     }
