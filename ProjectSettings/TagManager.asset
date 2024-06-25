@@ -9,9 +9,10 @@ TagManager:
   - EnemyFloor
   - KillBox
   - RoomTrigger
-  - PlatformTrigger
   - Enemy
   - KillBox1
+  - LeftPlatformTrigger
+  - RightPlatformTrigger
   layers:
   - Default
   - TransparentFX
@@ -21,7 +22,7 @@ TagManager:
   - UI
   - Ground
   - Coins
-  - 
+  - Walls
   - 
   - 
   - 
